@@ -1,6 +1,6 @@
 const User = require("../models/user");
 
-exports.signup = (req, res, next) => {
+exports.signup = async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
@@ -9,26 +9,20 @@ exports.signup = (req, res, next) => {
       .send({ error: "You must provide email and password! " });
   }
 
-  User.findOne({ email }, (err, existingUser) => {
-    if (err) {
-      return next(err);
-    }
+  try {
+    const existingUser = await User.findOne({ email });
 
     if (existingUser) {
       return res.status(422).send({ error: "Email is already in use." });
     }
 
-    const user = new User({
-      email,
-      password
-    });
+    const user = new User({ email, password });
+    await user.save();
 
-    user.save(err => {
-      if (err) {
-        return next(err);
-      }
-
-      return res.send({ success: true });
-    });
-  });
+    return res.send({ success: true });
+  } catch (err) {
+    if (err) {
+      return next(err);
+    }
+  }
 };
