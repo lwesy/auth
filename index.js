@@ -14,7 +14,7 @@ mongoose.connect("mongodb://localhost:27017/auth").then(() => {
 // App Setup
 app.use(morgan("combined"));
 app.use(bodyParser.json({ type: "*/*" }));
-router(app);
+app.use("/", router);
 
 // Server Setup
 const port = process.env.port || 3001;
