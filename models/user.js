@@ -11,23 +11,19 @@ const userSchema = new Schema({
   password: String
 });
 
-userSchema.pre("save", function(next) {
+userSchema.pre("save", async function(next) {
   const user = this;
 
-  bcrypt.genSalt(10, function(err, salt) {
-    if (err) {
-      return next(err);
-    }
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(user.password, salt);
 
-    bcrypt.hash(user.password, salt, function(err, hash) {
-      if (err) {
-        return next(err);
-      }
+    user.password = hash;
 
-      user.password = hash;
-      next();
-    });
-  });
+    return next();
+  } catch (err) {
+    return next(err);
+  }
 });
 
 const UserModel = mongoose.model("user", userSchema);
