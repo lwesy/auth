@@ -4,9 +4,35 @@ const ExtractJwt = require("passport-jwt").ExtractJwt;
 const LocalStrategy = require("passport-local");
 const User = require("../models/user");
 
+const localOptions = {
+  usernameField: "email"
+};
+
 const localLogin = new LocalStrategy(
-  { usernameField: "email" },
-  (email, password, done) => {}
+  localOptions,
+  async (email, password, done) => {
+    try {
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        return done(null, false);
+      }
+
+      user.comparePassword(password, (err, isMatch) => {
+        if (err) {
+          return done(err);
+        }
+
+        if (!isMatch) {
+          return done(null, false);
+        }
+
+        return done(null, user);
+      });
+    } catch (err) {
+      return done(err);
+    }
+  }
 );
 
 const jwtOptions = {
@@ -29,3 +55,4 @@ const jwtLogin = new JwtStrategy(jwtOptions, async (payload, done) => {
 });
 
 passport.use(jwtLogin);
+passport.use(localLogin);

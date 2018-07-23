@@ -7,6 +7,10 @@ const getTokenForUser = user => {
   return jwt.encode({ sub: user.id, iat: timestamp }, process.env.JWT_SECRET);
 };
 
+exports.signin = async (req, res, next) => {
+  return res.send({ token: getTokenForUser(req.user) });
+};
+
 exports.signup = async (req, res, next) => {
   const { email, password } = req.body;
 
@@ -28,8 +32,6 @@ exports.signup = async (req, res, next) => {
 
     return res.send({ token: getTokenForUser(user) });
   } catch (err) {
-    if (err) {
-      return next(err);
-    }
+    return next(err);
   }
 };
