@@ -10,6 +10,7 @@ export const signup = (formProps, callback) => async dispatch => {
     );
 
     dispatch({ type: types.AUTH_USER, payload: response.data.token });
+    localStorage.setItem("token", response.data.token);
     callback();
   } catch (error) {
     dispatch({ type: types.AUTH_ERROR, payload: "Email already in use." });
