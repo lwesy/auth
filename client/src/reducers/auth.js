@@ -1,8 +1,15 @@
+import * as types from "../actions/types";
+
 const initialState = {
   authenticated: "",
   errorMessage: ""
 };
 
 export default (state = initialState, action) => {
-  return state;
+  switch (action.type) {
+    case types.AUTH_USER:
+      return { ...state, authenticated: action.payload };
+    default:
+      return state;
+  }
 };
